@@ -7,7 +7,6 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', 'G-Y64P2Q3T3K');
     </script>
 
@@ -40,9 +39,7 @@
         }
 
         .right-logos {
-            
             justify-content: flex-end; /* Align to the right */
-            
         }
 
         .logo-right {
@@ -74,6 +71,36 @@
             max-width: 600px; /* Increase max-width for more space */
         }
     </style>
+
+    <!-- Loggly JavaScript Logger -->
+    <script type="text/javascript" src="https://cloudfront.loggly.com/js/loggly.tracker-latest.min.js" async></script>
+    <script type="text/javascript">
+        var _LTracker = _LTracker || [];
+        _LTracker.push({
+            'logglyKey': '355dc085-2c35-46f8-ac5d-4540de81e0af',
+            'sendConsoleErrors': true,
+            'tag': 'loggly-jslogger'
+        });
+
+        // Fetch IP address from an external API
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                // Log the page load event with IP address, timestamp, and user ID
+                var userID = 'exampleUserID';  // Replace with actual user ID from your app context
+                var ipAddress = data.ip;
+                _LTracker.push({
+                    'event': 'page_load',
+                    'timestamp': new Date().toISOString(),
+                    'userID': userID,
+                    'ip': ipAddress,
+                    'message': 'Page loaded successfully'
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching IP address:', error);
+            });
+    </script>
 </head>
 <body>
     <header class="header">
@@ -83,7 +110,6 @@
         <!-- Right Logos (side by side) -->
         <div class="right-logos">
             <img src="https://i.postimg.cc/cHVbZmqw/Screenshot-2024-11-23-225024.png" alt="Right Logo 1" class="logo-right">
-            
         </div>
     </header>
     <div class="container">
