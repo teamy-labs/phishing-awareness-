@@ -82,24 +82,35 @@
             'tag': 'loggly-jslogger'
         });
 
-        // Fetch IP address from an external API
-        fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(data => {
-                // Log the page load event with IP address, timestamp, and user ID
-                var userID = 'exampleUserID';  // Replace with actual user ID from your app context
-                var ipAddress = data.ip;
-                _LTracker.push({
-                    'event': 'page_load',
-                    'timestamp': new Date().toISOString(),
-                    'userID': userID,
-                    'ip': ipAddress,
-                    'message': 'Page loaded successfully'
+        window.onload = () => {
+            // Extract userID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const userID = urlParams.get('id');  // Extract userID from URL
+
+            // Fetch IP address from an external API
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    // Convert timestamp to IST
+                    const date = new Date();
+                    const offset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+                    const istDate = new Date(date.getTime() + offset);
+                    const istTimestamp = istDate.toISOString().slice(0, 19).replace('T', ' ');
+
+                    // Log the page load event with IP address, timestamp, and userID
+                    const ipAddress = data.ip;
+                    _LTracker.push({
+                        'event': 'page_load',
+                        'timestamp': istTimestamp, // Use IST timestamp
+                        'userID': userID || 'Unknown User',  // Log userID or 'Unknown User' if not available
+                        'ip': ipAddress,
+                        'message': 'Page loaded successfully'
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching IP address:', error);
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching IP address:', error);
-            });
+        };
     </script>
 </head>
 <body>
