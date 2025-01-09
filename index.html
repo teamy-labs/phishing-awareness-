@@ -5,7 +5,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y64P2Q3T3K"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
+        function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'G-Y64P2Q3T3K');
     </script>
@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You Have Been Phished</title>
 
-    <!-- Adding Google Font (optional, you can replace this with your preferred font) -->
+    <!-- Adding Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
@@ -73,7 +73,8 @@
     </style>
 
     <!-- Loggly JavaScript Logger -->
-    <script type="text/javascript">
+    <script type="text/javascript" src="https://cloudfront.loggly.com/js/loggly.tracker-latest.min.js" async></script>
+    <script>
         var _LTracker = _LTracker || [];
         _LTracker.push({
             'logglyKey': '983caeca-4bf3-4641-b2b7-4db368ebe635',
@@ -83,61 +84,60 @@
 
         async function fetchIP() {
             try {
-                // Use an alternative IP API endpoint as a fallback
-                const ipResponse = await fetch('https://api64.ipify.org?format=json', {
-                    headers: {
-                        'Cache-Control': 'no-cache', // Avoid caching
-                    }
+                const response = await fetch('https://api64.ipify.org?format=json', {
+                    cache: 'no-store', // Prevent caching issues
                 });
-                const ipData = await ipResponse.json();
-                return ipData.ip;
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.ip || 'Unknown IP';
+                } else {
+                    console.warn('Failed to fetch IP: HTTP Error', response.status);
+                    return 'Unknown IP';
+                }
             } catch (error) {
                 console.error('Error fetching IP address:', error);
                 return 'Unknown IP';
             }
         }
 
-        async function logActivity() {
+        window.onload = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userID = urlParams.get('id') || 'Unknown User';
+
+            const ipAddress = await fetchIP();
+
+            const date = new Date();
+            const offset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+            const istDate = new Date(date.getTime() + offset);
+            const istTimestamp = istDate.toISOString().slice(0, 19).replace('T', ' ');
+
+            _LTracker.push({
+                'event': 'page_load',
+                'timestamp': istTimestamp,
+                'userID': userID,
+                'ip': ipAddress,
+                'message': 'Page loaded successfully'
+            });
+
+            // Send logs to your server for backup
             try {
-                const ipAddress = await fetchIP();
-
-                // Extract userID from URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const userID = urlParams.get('id') || 'Unknown User';
-
-                // Convert timestamp to IST
-                const date = new Date();
-                const offset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
-                const istDate = new Date(date.getTime() + offset);
-                const istTimestamp = istDate.toISOString().slice(0, 19).replace('T', ' ');
-
-                // Log the event to Loggly
-                _LTracker.push({
-                    'event': 'page_load',
-                    'timestamp': istTimestamp,
-                    'userID': userID,
-                    'ip': ipAddress,
-                    'message': 'Page loaded successfully'
-                });
-
-                // Fallback log to your server to bypass Brave's restrictions
                 await fetch('/log', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         event: 'page_load',
                         timestamp: istTimestamp,
                         userID: userID,
                         ip: ipAddress,
-                        message: 'Page loaded via fallback'
+                        message: 'Page loaded successfully'
                     })
                 });
             } catch (error) {
-                console.error('Error logging activity:', error);
+                console.error('Error sending logs to server:', error);
             }
-        }
-
-        window.onload = logActivity;
+        };
     </script>
 </head>
 <body>
@@ -145,7 +145,7 @@
         <!-- Left Logo -->
         <img src="https://i.ibb.co/x1H8ZmV/Whats-App-Image-2024-11-23-at-22-48-41-b3815916.jpg" alt="Left Logo" class="logo-left">
         
-        <!-- Right Logos (side by side) -->
+        <!-- Right Logos -->
         <div class="right-logos">
             <img src="https://i.ibb.co/fFvrJFj/Screenshot-2024-11-23-225024.png" alt="Right Logo 1" class="logo-right">
         </div>
