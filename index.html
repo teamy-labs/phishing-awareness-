@@ -5,7 +5,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y64P2Q3T3K"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-Y64P2Q3T3K');
     </script>
@@ -21,7 +21,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif; /* Set new font */
+            font-family: 'Roboto', sans-serif;
             background: url('https://i.ibb.co/RHgctkw/Screenshot-2024-11-28-110003.png') no-repeat center center fixed;
             background-size: cover;
         }
@@ -31,19 +31,19 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.7); /* Optional background for better visibility */
+            background: rgba(0, 0, 0, 0.7);
         }
 
         .logo-left {
-            width: 100px; /* Increased size for left logo */
+            width: 100px;
         }
 
         .right-logos {
-            justify-content: flex-end; /* Align to the right */
+            justify-content: flex-end;
         }
 
         .logo-right {
-            width: 100px; /* Standard size for right logos */
+            width: 100px;
         }
 
         .container {
@@ -51,29 +51,28 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 70px); /* Subtract header height */
+            height: calc(100vh - 70px);
             padding: 50px;
-            background: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay for readability */
-            text-align: center; /* Centering text */
+            background: rgba(0, 0, 0, 0.6);
+            text-align: center;
         }
 
         .title {
-            font-size: 48px; /* Larger font size for the title */
+            font-size: 48px;
             color: #fff;
             margin-bottom: 20px;
-            font-weight: bold; /* Optional bold for emphasis */
+            font-weight: bold;
         }
 
         .subtitle {
-            font-size: 24px; /* Larger font size for subtitle */
+            font-size: 24px;
             color: #f0f0f0;
             line-height: 1.6;
-            max-width: 600px; /* Increase max-width for more space */
+            max-width: 600px;
         }
     </style>
 
     <!-- Loggly JavaScript Logger -->
-    <script type="text/javascript" src="https://cloudfront.loggly.com/js/loggly.tracker-latest.min.js" async></script>
     <script type="text/javascript">
         var _LTracker = _LTracker || [];
         _LTracker.push({
@@ -82,35 +81,63 @@
             'tag': 'loggly-jslogger'
         });
 
-        window.onload = () => {
-            // Extract userID from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const userID = urlParams.get('id');  // Extract userID from URL
-
-            // Fetch IP address from an external API
-            fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => {
-                    // Convert timestamp to IST
-                    const date = new Date();
-                    const offset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
-                    const istDate = new Date(date.getTime() + offset);
-                    const istTimestamp = istDate.toISOString().slice(0, 19).replace('T', ' ');
-
-                    // Log the page load event with IP address, timestamp, and userID
-                    const ipAddress = data.ip;
-                    _LTracker.push({
-                        'event': 'page_load',
-                        'timestamp': istTimestamp, // Use IST timestamp
-                        'userID': userID || 'Unknown User',  // Log userID or 'Unknown User' if not available
-                        'ip': ipAddress,
-                        'message': 'Page loaded successfully'
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching IP address:', error);
+        async function fetchIP() {
+            try {
+                // Use an alternative IP API endpoint as a fallback
+                const ipResponse = await fetch('https://api64.ipify.org?format=json', {
+                    headers: {
+                        'Cache-Control': 'no-cache', // Avoid caching
+                    }
                 });
-        };
+                const ipData = await ipResponse.json();
+                return ipData.ip;
+            } catch (error) {
+                console.error('Error fetching IP address:', error);
+                return 'Unknown IP';
+            }
+        }
+
+        async function logActivity() {
+            try {
+                const ipAddress = await fetchIP();
+
+                // Extract userID from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const userID = urlParams.get('id') || 'Unknown User';
+
+                // Convert timestamp to IST
+                const date = new Date();
+                const offset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+                const istDate = new Date(date.getTime() + offset);
+                const istTimestamp = istDate.toISOString().slice(0, 19).replace('T', ' ');
+
+                // Log the event to Loggly
+                _LTracker.push({
+                    'event': 'page_load',
+                    'timestamp': istTimestamp,
+                    'userID': userID,
+                    'ip': ipAddress,
+                    'message': 'Page loaded successfully'
+                });
+
+                // Fallback log to your server to bypass Brave's restrictions
+                await fetch('/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event: 'page_load',
+                        timestamp: istTimestamp,
+                        userID: userID,
+                        ip: ipAddress,
+                        message: 'Page loaded via fallback'
+                    })
+                });
+            } catch (error) {
+                console.error('Error logging activity:', error);
+            }
+        }
+
+        window.onload = logActivity;
     </script>
 </head>
 <body>
