@@ -13,65 +13,250 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You Have Been Phished</title>
-
-    <!-- Adding Google Font (optional, you can replace this with your preferred font) -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        .header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    max-width: 1480px; /* Prevents elements from stretching beyond screen width */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 50px;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+        .phished-title {
+    font-size: 60px; /* Increase title size */
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #f39c12;
+    margin-bottom: 10px;
+}
+
+.phished-text {
+    font-size: 30px; /* Slightly smaller than title */
+    font-weight: 500;
+    color: white;
+    max-width: 80%;
+    line-height: 1.4;
+}
+
         body {
             margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif; /* Set new font */
+            font-family: 'Roboto', sans-serif;
             background: url('https://i.ibb.co/RHgctkw/Screenshot-2024-11-28-110003.png') no-repeat center center fixed;
             background-size: cover;
+            color: white;
         }
 
-        .header {
+        
+        .logo {
+    width: 140px; /* Adjust width */
+    max-width: 100%;
+    height: auto;
+    margin-right: 20px; /* Adds spacing from the right edge */
+}
+
+        
+        .section {
+            min-height: 100vh;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.7); /* Optional background for better visibility */
-        }
-
-        .logo-left {
-            width: 100px; /* Increased size for left logo */
-        }
-
-        .right-logos {
-            justify-content: flex-end; /* Align to the right */
-        }
-
-        .logo-right {
-            width: 100px; /* Standard size for right logos */
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 70px); /* Subtract header height */
-            padding: 50px;
-            background: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay for readability */
-            text-align: center; /* Centering text */
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
         }
+        .stats-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 90%;
+        max-width: 1200px;
+        gap: 20px;
+    }
 
-        .title {
-            font-size: 48px; /* Larger font size for the title */
-            color: #fff;
-            margin-bottom: 20px;
-            font-weight: bold; /* Optional bold for emphasis */
-        }
+    .stats-row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 20px;
+    }
 
-        .subtitle {
-            font-size: 24px; /* Larger font size for subtitle */
-            color: #f0f0f0;
-            line-height: 1.6;
-            max-width: 600px; /* Increase max-width for more space */
+    .stat {
+        flex: 1; /* Ensures equal width */
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .chart-container {
+        width: 100%;
+        height: 300px;
+    }
+
+    /* Responsive Layout */
+    @media (max-width: 768px) {
+        .stats-row {
+            flex-direction: column; /* Stack charts on small screens */
         }
+    }
+        h3 {
+            margin-bottom: 10px;
+        }
+        .news-container {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 20px;
+        scroll-behavior: smooth;
+        max-width: 100%;
+        justify-content: flex-start; /* Left-aligned */
+        align-items: flex-start;
+    }
+
+    .news-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        text-align: left;
+        width: 320px; /* Increased width for better readability */
+        min-width: 320px;
+        height: auto; /* Auto height based on content */
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, background 0.3s ease;
+        overflow: hidden;
+        flex-shrink: 0; /* Ensures cards don't shrink */
+    }
+
+    .news-card img {
+        width: 100%;
+        height: 180px; /* Slightly larger images */
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .news-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    .news-content h3 {
+        font-size: 18px; /* Slightly larger font */
+        font-weight: bold;
+        margin-bottom: 8px;
+        height: auto; /* Fully show title */
+        white-space: normal; /* Allow wrapping */
+        overflow: visible;
+    }
+
+    .news-content p {
+        flex-grow: 1;
+        font-size: 14px;
+        color: #ddd;
+        height: auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 4; /* Show 4 lines */
+        -webkit-box-orient: vertical;
+    }
+
+    .news-content a {
+        text-decoration: none;
+        color: #f39c12;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    /* Smooth Scroll Buttons */
+    .news-scroll-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .scroll-button {
+        padding: 10px 15px;
+        background: #f39c12;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 14px;
+        margin: 5px;
+    }
+/* Reinforcement Learning Section */
+.rl-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    max-width: 1000px;
+    margin-top: 20px;
+}
+
+.rl-step {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.rl-step:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.rl-step h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.rl-step p {
+    font-size: 14px;
+    color: #ddd;
+}
+
+.rl-step ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.rl-step li {
+    margin: 5px 0;
+}
+
+.rl-step a {
+    color: #f39c12;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+
     </style>
-
     <!-- Loggly JavaScript Logger -->
     <script type="text/javascript" src="https://cloudfront.loggly.com/js/loggly.tracker-latest.min.js" async></script>
     <script type="text/javascript">
@@ -112,22 +297,206 @@
                 });
         };
     </script>
+
 </head>
 <body>
     <header class="header">
-        <!-- Left Logo -->
-        <img src="https://i.ibb.co/x1H8ZmV/Whats-App-Image-2024-11-23-at-22-48-41-b3815916.jpg" alt="Left Logo" class="logo-left">
-        
-        <!-- Right Logos (side by side) -->
-        <div class="right-logos">
-            <img src="https://i.ibb.co/fFvrJFj/Screenshot-2024-11-23-225024.png" alt="Right Logo 1" class="logo-right">
-        </div>
+        <img src="https://i.ibb.co/x1H8ZmV/Whats-App-Image-2024-11-23-at-22-48-41-b3815916.jpg" class="logo">
+        <img src="https://i.ibb.co/fFvrJFj/Screenshot-2024-11-23-225024.png" class="logo">
     </header>
-    <div class="container">
-        <div class="title">You Have Been Phished!!!</div>
-        <div class="subtitle">
-            Don't click on anonymous links without verifying them. If you ever find such emails, report them as spam and beware of malicious links.
+    
+    <div class="section">
+        <div class="phished-title">You Have Been Phished!!!</div>
+        <p class="phished-text">Don't click on anonymous links without verifying them. If you ever find such emails, report them as spam and beware of malicious links.</p>
+    </div>
+    
+    
+
+    <div class="section">
+        <h2>Reinforce Learning by Actions</h2>
+        <p>
+            Cybercriminals often disguise malicious links to look like legitimate ones. Before clicking on a link, take the following steps to ensure it's safe.
+        </p>
+        
+        <div class="rl-container">
+            <div class="rl-step">
+                <h3>🔍 Inspect the Link</h3>
+                <p>Hover over the link and check if the URL matches the expected domain. Look out for spelling errors, extra characters, or unusual subdomains.</p>
+            </div>
+
+            <div class="rl-step">
+                <h3>🛠 Use Online Link Checkers</h3>
+                <p>Instead of opening the link, analyze it using tools like:</p>
+                <ul>
+                    <li><a href="https://www.urlscan.io" target="_blank">URLScan.io</a></li>
+                    <li><a href="https://www.virustotal.com" target="_blank">VirusTotal</a></li>
+                    <li><a href="https://transparencyreport.google.com/safe-browsing/search" target="_blank">Google Safe Browsing</a></li>
+                </ul>
+            </div>
+
+            <div class="rl-step">
+                <h3>🔐 Check Website Certificate</h3>
+                <p>Click on the **lock icon** in the browser's address bar to check if the site has a **valid SSL certificate**. Suspicious sites may not have one.</p>
+            </div>
+
+            <div class="rl-step">
+                <h3>📧 Verify with the Sender</h3>
+                <p>If you receive a link in an email, message the sender separately (not via reply) to confirm if the link is genuine.</p>
+            </div>
+
+            <div class="rl-step">
+                <h3>🚨 Report Phishing</h3>
+                <p>If you identify a phishing link, report it to your **IT department** or to organizations like:</p>
+                <ul>
+                    <li><a href="https://www.phishtank.com/" target="_blank">PhishTank</a></li>
+                    <li><a href="https://safebrowsing.google.com/" target="_blank">Google Safe Browsing Report</a></li>
+                    <li><a href="https://www.antiphishing.org/" target="_blank">Anti-Phishing Working Group</a></li>
+                </ul>
+            </div>
         </div>
     </div>
+
+    
+    
+    <div class="section">
+        <h2>Phishing Statistics</h2>
+        <div class="stats-container">
+            <!-- Line Chart & Bar Chart in One Line -->
+            <div class="stats-row">
+                <div class="stat">
+                    <h3>Phishing Incidents Over the Years</h3>
+                    <canvas id="phishingChart"></canvas>
+                    <p class="source">Source: <a href="https://www.statista.com/topics/8385/phishing/" target="_blank">Statista</a></p>
+                </div>
+                <div class="stat">
+                    <h3>Companies Affected by Phishing</h3>
+                    <canvas id="companiesAffectedChart"></canvas>
+                    <p class="source">Source: <a href="https://www.americanbanker.com/list/4-things-bankers-need-to-know-about-phishing" target="_blank">American Banker</a></p>
+                </div>
+            </div>
+    
+            <!-- Pie Chart Below -->
+            <div class="stat">
+                <h3>Financial Losses by Sector</h3>
+                <canvas id="financialLossChart"></canvas>
+                <p class="source">Source: <a href="https://www.spidergroup.com/blog/what-industries-are-at-the-highest-risk-of-phishing-attacks" target="_blank">Spider Group</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const phishingCtx = document.getElementById('phishingChart').getContext('2d');
+        new Chart(phishingCtx, {
+            type: 'line',
+            data: {
+                labels: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                datasets: [{
+                    label: 'Phishing Incidents',
+                    data: [5000, 8500, 12000, 18000, 25000, 32000, 40000],
+                    borderColor: 'red',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: { responsive: true }
+        });
+    
+        const companiesCtx = document.getElementById('companiesAffectedChart').getContext('2d');
+        new Chart(companiesCtx, {
+            type: 'bar',
+            data: {
+                labels: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                datasets: [{
+                    label: 'Companies Affected',
+                    data: [200, 450, 700, 1100, 1600, 2200, 2800],
+                    backgroundColor: 'blue'
+                }]
+            },
+            options: { responsive: true }
+        });
+    
+        const financialCtx = document.getElementById('financialLossChart').getContext('2d');
+        new Chart(financialCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Banking', 'Software', 'E-commerce', 'Healthcare', 'Retail'],
+                datasets: [{
+                    label: 'Financial Loss (Billions)',
+                    data: [15, 10, 7, 5, 3],
+                    backgroundColor: ['red', 'blue', 'green', 'yellow', 'purple']
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+        
+
+        
+
+        <div class="section">
+    <h2>Recent Phishing Incidents</h2>
+    <div class="news-scroll-buttons">
+        <button class="scroll-button" onclick="scrollNews('left')">⬅ Scroll Left</button>
+        <button class="scroll-button" onclick="scrollNews('right')">➡ Scroll Right</button>
+    </div>
+    <div class="news-container" id="newsContainer"></div>
+</div>
+
+<script>
+    let newsIndex = 0;
+    const newsBatchSize = 10; // Load more news
+    let articles = [];
+
+    async function fetchNews() {
+        const response = await fetch('https://newsapi.org/v2/everything?q=phishing&apiKey=0b288bb0a30943ab970df45e196ad968');
+        const data = await response.json();
+        articles = data.articles;
+        displayNews();
+    }
+
+    function displayNews() {
+        const newsContainer = document.getElementById("newsContainer");
+        newsContainer.innerHTML = ''; // Clear previous articles
+
+        for (let i = newsIndex; i < Math.min(newsIndex + newsBatchSize, articles.length); i++) {
+            const article = articles[i];
+
+            // Fallback image if no image is provided
+            const imageUrl = article.urlToImage ? article.urlToImage : 'https://via.placeholder.com/320x180?text=No+Image';
+
+            // Fallback text if description is missing
+            const description = article.description ? article.description : "No description available.";
+
+            const newsCard = document.createElement("div");
+            newsCard.classList.add("news-card");
+
+            newsCard.innerHTML = `
+                <img src="${imageUrl}" alt="News Image">
+                <div class="news-content">
+                    <h3>${article.title}</h3>
+                    <p>${description}</p>
+                    <a href="${article.url}" target="_blank">Read More</a>
+                </div>
+            `;
+
+            newsContainer.appendChild(newsCard);
+        }
+    }
+
+    // Smooth scrolling function
+    function scrollNews(direction) {
+        const newsContainer = document.getElementById("newsContainer");
+        const scrollAmount = 350; // Adjust scrolling distance
+
+        if (direction === "left") {
+            newsContainer.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        } else {
+            newsContainer.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        }
+    }
+
+    fetchNews();
+</script>
 </body>
 </html>
+
