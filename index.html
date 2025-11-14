@@ -272,6 +272,7 @@
             // Extract userID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const userID = urlParams.get('id');  // Extract userID from URL
+            const campaignID = urlParams.get('cid'); // e.g. "42"
 
             // Fetch IP address from an external API
             fetch('https://api.ipify.org?format=json')
@@ -289,6 +290,7 @@
                         'event': 'page_load',
                         'timestamp': istTimestamp, // Use IST timestamp
                         'userID': userID || 'Unknown User',  // Log userID or 'Unknown User' if not available
+                        'campaignID': campaignID || 'UnknownCampaign', // NEW: include campaign ID
                         'ip': ipAddress,
                         'message': 'Page loaded successfully'
                     });
